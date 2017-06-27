@@ -1,0 +1,29 @@
+{
+  "name": "consulta-cpf-cnpj-nodejs",
+  "version": "1.0.0",
+  "description": "API de consulta de CPF/CNPJ na Receita Federal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "api",
+    "consulta",
+    "cpf",
+    "cnpj",
+    "receita",
+    "federal"
+  ],
+  "author": "Miller P. Magalhães",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "jsdom": "^11.0.0",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.5.2"
+  }
+}
