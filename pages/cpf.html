@@ -39,7 +39,7 @@
 </form>
 
 <script>
-    fetch('http://localhost:3000/cpf/getcaptcha').then(function (response) {
+    fetch('/cpf/getcaptcha').then(function (response) {
         var contentType = response.headers.get('content-type');
         if (contentType && contentType.indexOf('application/json') !== -1) {
             return response.json().then(function (json) {
