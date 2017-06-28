@@ -42,9 +42,9 @@ app.get('/cpf/getcaptcha', function(req, res) {
     })
     .end()
     .then(function (result) {
-        console.log('HALT ELECTRON', nightmare.halt().then(() => {
+        nightmare.halt().then(() => {
             console.log('ELECTRON HALT');
-        }));
+        });
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(result));
     })
