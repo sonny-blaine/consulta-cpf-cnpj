@@ -24,7 +24,11 @@ app.get('/cpf/getcaptcha', function(req, res) {
 
     nightmare
     .useragent('Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0')
-    .goto('http://cpf.receita.fazenda.gov.br/situacao/')
+    .header(['http://cpf.receita.fazenda.gov.br/situacao/'])
+    .goto('http://cpf.receita.fazenda.gov.br/situacao/', {
+        referrer: 'http://cpf.receita.fazenda.gov.br/situacao/',
+        method: 'GET'
+    })
     .wait(function(){
         return (document.querySelector('#img_captcha_serpro_gov_br').src !== 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAAyCAYAAAD1JPH3AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB98HDhIGOWu+9+kAAAB3SURBVHja7dIBDQAACMMwwL/n4wNaCcs6SQqOGAkwNBgaDA2GxtBgaDA0GBoMjaHB0GBoMDQYGkODocHQYGgwNIYGQ4OhwdBgaAwNhgZDg6HB0BgaDA2GBkODoTE0GBoMDYbG0GBoMDQYGgyNocHQYGgwNBiabxY7GwRg7rtJrAAAAABJRU5ErkJggg==');
     })
@@ -38,6 +42,9 @@ app.get('/cpf/getcaptcha', function(req, res) {
     })
     .end()
     .then(function (result) {
+        console.log('HALT ELECTRON', nightmare.halt().then(() => {
+            console.log('ELECTRON HALT');
+        }));
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(result));
     })
@@ -77,7 +84,8 @@ app.post('/cpf/processar', function(req, res) {
                 url: 'http://cpf.receita.fazenda.gov.br/situacao/ConsultaSituacao.asp',
                 form: dadosEnviar,
                 headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0'
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0',
+                    'Referer': 'http://cpf.receita.fazenda.gov.br/situacao/'
                 },
                 followAllRedirects: true,
             },
