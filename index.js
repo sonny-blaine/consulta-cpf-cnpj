@@ -2,12 +2,20 @@ let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
 let request = require('request');
+let fs = require('fs');
 let jsdom = require("jsdom");
 let { JSDOM } = jsdom;
 let fetch = require('fetch-base64');
+let session = require('express-session');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({ secret: 'safmksdgafmklamlkgsakmlasdlkmlkm', cookie: { maxAge: 3600 }}));
+
+app.get('/', function(req,res){
+    'use strict';
+   res.send('run');
+});
 
 // GET - CPF Captcha
 app.get('/cpf/getcaptcha', function(req, res) {
@@ -22,9 +30,10 @@ app.get('/cpf/getcaptcha', function(req, res) {
     })
     .evaluate(function() {
         return {
-            captcha: document.querySelector('#img_captcha_serpro_gov_br').src,
-            tokenCpf: document.getElementById('txtToken_captcha_serpro_gov_br').value,
-            status: true
+            captcha_cpf: document.querySelector('#img_captcha_serpro_gov_br').src,
+            token_cpf: document.getElementById('txtToken_captcha_serpro_gov_br').value,
+            status: true,
+            cookieId: ''
         }
     })
     .end()
@@ -36,8 +45,9 @@ app.get('/cpf/getcaptcha', function(req, res) {
         console.error('Search failed:', error);
 
         let result = {
-            captcha: '',
-            tokenCpf: '',
+            captcha_cpf: '',
+            token_cpf: '',
+            cookieId: '',
             status: false,
             error: error
         };
@@ -120,15 +130,45 @@ app.get('/cnpj/consulta', function(req, res) {
 
 // GET - CNPJ Captcha
 app.get('/cnpj/getcaptcha', function(req, res) {
+    try {
+        fs.writeFile('cookies/' + req.sessionID + '.json', '', function () {
+            let FileCookieStore = require('tough-cookie-filestore');
+            let j = request.jar(new FileCookieStore('cookies/' + req.sessionID + '.json'));
+            let options = {};
+            options.url = 'http://www.receita.fazenda.gov.br/PessoaJuridica/CNPJ/cnpjreva/captcha/gerarCaptcha.asp';
+            options.method = 'GET';
+            options.encoding = 'base64';
+            options.jar = j;
+            options.headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0',
+            };
 
+            request.get(options, function (err, response, corpo) {
+                if (response.statusCode === 200) {
 
-    fetch.remote('http://www.receita.fazenda.gov.br/PessoaJuridica/CNPJ/cnpjreva/captcha/gerarCaptcha.asp').then((data) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({'data': data}));
-    }).catch((reason) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({'data': 'erro', 'reason': reason}));
-    });
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(JSON.stringify({
+                        'base64': corpo,
+                        'cookieId': req.sessionID,
+                        'success': true
+                    }));
+                } else {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(JSON.stringify({
+                        'base64': '',
+                        'success': false
+                    }));
+                }
+            });
+        });
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+// GET - Consulta CNPJ Form
+app.get('/cnpj/processa', function(req, res) {
+
 });
 
 app.listen(3000, function () {

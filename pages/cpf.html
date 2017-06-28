@@ -44,8 +44,8 @@
         if (contentType && contentType.indexOf('application/json') !== -1) {
             return response.json().then(function (json) {
                 console.log(json);
-                document.getElementById('txtToken_captcha_serpro_gov_br').value = json.tokenCpf;
-                document.getElementById('captchaImagem').src = json.captcha;
+                document.getElementById('txtToken_captcha_serpro_gov_br').value = json.token_cpf;
+                document.getElementById('captchaImagem').src = json.captcha_cpf;
                 document.getElementById('aguarde').style.display = 'none';
                 document.getElementById('captchaImagem').style.display = 'block';
             });
