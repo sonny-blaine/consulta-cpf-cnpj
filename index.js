@@ -4,11 +4,13 @@ let bodyParser = require('body-parser');
 let request = require('request');
 let jsdom = require("jsdom");
 let { JSDOM } = jsdom;
+let fetch = require('fetch-base64');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/getcaptcha', function(req, res) {
+// GET - CPF Captcha
+app.get('/cpf/getcaptcha', function(req, res) {
     let Nightmare = require('nightmare');
     let nightmare = Nightmare({ show: false });
 
@@ -44,11 +46,13 @@ app.get('/getcaptcha', function(req, res) {
     });
 });
 
-app.get('/consulta-cpf', function(req, res) {
-    res.sendFile(__dirname+'/pages/form.html');
+// GET - Consulta CPF Form
+app.get('/cpf/consulta', function(req, res) {
+    res.sendFile(__dirname+'/pages/cpf.html');
 });
 
-app.post('/processar', function(req, res) {
+// POST - CPF Data
+app.post('/cpf/processar', function(req, res) {
 
     try {
 
@@ -59,8 +63,7 @@ app.post('/processar', function(req, res) {
             'txtDataNascimento': req.body.txtDataNascimento,
         };
 
-        request.post(
-            {
+        request.post({
                 url: 'http://cpf.receita.fazenda.gov.br/situacao/ConsultaSituacao.asp',
                 form: dadosEnviar,
                 headers: {
@@ -72,30 +75,30 @@ app.post('/processar', function(req, res) {
                 const dom = new JSDOM(body);
 
                 let retornoConsulta = {
-                    'Numero': '',
-                    'Nome': '',
-                    'DataNascimento': '',
-                    'Situacao': '',
-                    'DataInscricao': '',
-                    'DigitoVerificador': '',
-                    'Status': 'Parâmetros Inválidos',
-                    'Success': false
+                    Numero: '',
+                    Nome: '',
+                    DataNascimento: '',
+                    Situacao: '',
+                    DataInscricao: '',
+                    DigitoVerificador: '',
+                    Status: 'Parâmetros Inválidos',
+                    Success: false
                 };
 
-                if(dom.window.document.querySelector('#idMessageError') !== null){
-                    retornoConsulta.Status = dom.window.document.querySelector('#idMessageError').textContent.replace(/(\r\n|\n|\r)/gm,"").trim();
+                if (dom.window.document.querySelector('#idMessageError') !== null) {
+                    retornoConsulta.Status = dom.window.document.querySelector('#idMessageError').textContent.replace(/(\r\n|\n|\r)/gm, '').trim();
                 }
 
                 if (dom.window.document.querySelector('#idCnt05') !== null) {
                     retornoConsulta = {
-                        'Numero': dom.window.document.querySelector('#idCnt05').firstElementChild.textContent,
-                        'Nome': dom.window.document.querySelector('#idCnt04').firstElementChild.textContent,
-                        'DataNascimento': dom.window.document.querySelector('#idCnt13').firstElementChild.textContent,
-                        'Situacao': dom.window.document.querySelector('#idCnt06').firstElementChild.textContent,
-                        'DataInscricao': dom.window.document.querySelector('#idCnt14').firstElementChild.textContent,
-                        'DigitoVerificador': dom.window.document.querySelector('#idCnt07').firstElementChild.textContent,
-                        'Status': 'OK',
-                        'Success': true
+                        Numero: dom.window.document.querySelector('#idCnt05').firstElementChild.textContent,
+                        Nome: dom.window.document.querySelector('#idCnt04').firstElementChild.textContent,
+                        DataNascimento: dom.window.document.querySelector('#idCnt13').firstElementChild.textContent,
+                        Situacao: dom.window.document.querySelector('#idCnt06').firstElementChild.textContent,
+                        DataInscricao: dom.window.document.querySelector('#idCnt14').firstElementChild.textContent,
+                        DigitoVerificador: dom.window.document.querySelector('#idCnt07').firstElementChild.textContent,
+                        Status: 'OK',
+                        Success: true
                     };
                 }
 
@@ -108,6 +111,24 @@ app.post('/processar', function(req, res) {
         console.log(err);
         console.log('Deu Erro!');
     }
+});
+
+// GET - Consulta CNPJ Form
+app.get('/cnpj/consulta', function(req, res) {
+    res.sendFile(__dirname+'/pages/cnpj.html');
+});
+
+// GET - CNPJ Captcha
+app.get('/cnpj/getcaptcha', function(req, res) {
+
+
+    fetch.remote('http://www.receita.fazenda.gov.br/PessoaJuridica/CNPJ/cnpjreva/captcha/gerarCaptcha.asp').then((data) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify({'data': data}));
+    }).catch((reason) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify({'data': 'erro', 'reason': reason}));
+    });
 });
 
 app.listen(3000, function () {

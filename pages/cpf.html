@@ -1,0 +1,56 @@
+<form action="/cpf/processar" method="post">
+    <input type="hidden" id="txtToken_captcha_serpro_gov_br" name="txtToken_captcha_serpro_gov_br">
+    <label for="txtTempCPF">CPF</label>
+    <br/>
+    <input type="text" id="txtTempCPF" name="txtCPF" placeholder="CPF" value="148.364.847.82" maxlength="11" value="">
+    <br/>
+    <br/>
+    <label for="txtTempNascimento">Data de Nascimento</label>
+    <br/>
+    <input type="text" name="txtDataNascimento" id="txtTempNascimento" placeholder="Data de Nascimento"
+           value="30/08/1994" maxlength="8">
+    <br/>
+    <br/>
+    <svg id="aguarde" width='70px' height='70px' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+         preserveAspectRatio="xMidYMid" class="uil-blank">
+        <rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect>
+        <g transform="scale(0.55)">
+            <circle cx="30" cy="150" r="30" fill="#eb8614">
+                <animate attributeName="opacity" from="0" to="1" dur="1s" begin="0" repeatCount="indefinite"
+                         keyTimes="0;0.5;1" values="0;1;1"></animate>
+            </circle>
+            <path d="M90,150h30c0-49.7-40.3-90-90-90v30C63.1,90,90,116.9,90,150z" fill="#fb9610">
+                <animate attributeName="opacity" from="0" to="1" dur="1s" begin="0.1" repeatCount="indefinite"
+                         keyTimes="0;0.5;1" values="0;1;1"></animate>
+            </path>
+            <path d="M150,150h30C180,67.2,112.8,0,30,0v30C96.3,30,150,83.7,150,150z" fill="#fb9610">
+                <animate attributeName="opacity" from="0" to="1" dur="1s" begin="0.2" repeatCount="indefinite"
+                         keyTimes="0;0.5;1" values="0;1;1"></animate>
+            </path>
+        </g>
+    </svg>
+    <img id="captchaImagem" src="" style="display: none;">
+    <br/>
+    <label id="lblTexto_captcha_serpro_gov_br" for="txtTexto_captcha_serpro_gov_br">Digite os caracteres acima:</label>
+    <br/>
+    <input id="txtTexto_captcha_serpro_gov_br" name="txtTexto_captcha_serpro_gov_br">
+    <br/>
+    <input type="submit">
+</form>
+
+<script>
+    fetch('http://localhost:3000/cpf/getcaptcha').then(function (response) {
+        var contentType = response.headers.get('content-type');
+        if (contentType && contentType.indexOf('application/json') !== -1) {
+            return response.json().then(function (json) {
+                console.log(json);
+                document.getElementById('txtToken_captcha_serpro_gov_br').value = json.tokenCpf;
+                document.getElementById('captchaImagem').src = json.captcha;
+                document.getElementById('aguarde').style.display = 'none';
+                document.getElementById('captchaImagem').style.display = 'block';
+            });
+        } else {
+            console.log('Oops, we haven\'t got JSON!');
+        }
+    });
+</script>
