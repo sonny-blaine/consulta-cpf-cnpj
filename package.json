@@ -24,6 +24,7 @@
     "express-session": "^1.15.3",
     "fetch-base64": "^1.0.0",
     "jsdom": "^11.0.0",
+    "nightmare": "^2.10.0",
     "node-base64-image": "^1.0.3",
     "request": "^2.81.0",
     "tough-cookie-filestore": "0.0.1"
