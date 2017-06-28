@@ -2,9 +2,10 @@
   "name": "consulta-cpf-cnpj-nodejs",
   "version": "1.0.0",
   "description": "API de consulta de CPF/CNPJ na Receita Federal",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "Xvfb -ac -screen scrn 100x100x24 :9.0 && export DISPLAY=:9.0 && DEBUG=* node server.js"
   },
   "keywords": [
     "api",
